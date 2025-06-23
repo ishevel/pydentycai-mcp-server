@@ -1,0 +1,33 @@
+## AI Coding Assistant Guidelines
+
+1. **Language**
+   * Write all technical instructions and code comments in **Russian**.
+   * Deliver conversational answers to the user in **Russian**.
+
+2. **Respect Existing Code**
+   * Never delete or modify current functionality, code, or comments unless explicitly requested.
+
+3. **Scope Control**
+   * Implement only what the task specifies.
+   * You may suggest improvements, but do **not** implement them without approval.
+
+4. **Project Familiarity**
+   * Review all relevant files, logs, and architecture before coding to avoid duplication and maintain alignment with the current design.
+
+5. **Consistency & Style**
+   * Follow the project’s established style, logic, and architecture.
+   * Prefer clear, simple solutions over complex ones.
+
+6. **Technology Preference**
+   * Default to **Golang** with JSON configuration, unless the project mandates another stack.
+
+7. **Verification & Debugging**
+   * Test hypotheses (e.g., inspect logs) before changing code.
+   * Run console commands incrementally to confirm correctness.
+
+8. **Collaboration**
+   * Ask clarifying questions when information is insufficient.
+   * Provide step-by-step solutions and wait for user confirmation before applying changes.
+
+9. **Quality Assurance**
+   * Ensure accuracy, coherence, and consistency of your code before marking a task complete.
