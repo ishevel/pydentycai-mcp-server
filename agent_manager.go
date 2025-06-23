@@ -3,6 +3,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -14,20 +15,6 @@ import (
 
 	"github.com/mark3labs/mcp-go/mcp"
 )
-
-// JSONResult представляет собой результат, который может быть преобразован в JSON.
-type JSONResult struct {
-	Data map[string]any `json:"data"`
-}
-
-// ToMCPResult преобразует JSONResult в mcp.Result.
-func (r JSONResult) ToMCPResult() mcp.Result {
-	return mcp.Result{
-		Meta: map[string]any{
-			"data": r.Data,
-		},
-	}
-}
 
 const (
 	configsDir = "configs/agents"
@@ -128,16 +115,17 @@ func (am *AgentManager) RunAgent(ctx context.Context, request mcp.CallToolReques
 		}
 	}()
 
-	return &mcp.CallToolResult{
-		Result: JSONResult{
-			Data: map[string]any{
-				"agent_id": agentID,
-				"pid":      agentProcess.PID,
-				"status":   agentProcess.Status,
-				"message":  fmt.Sprintf("Агент '%s' запущен с PID %d.", agentID, agentProcess.PID),
-			},
-		}.ToMCPResult(),
-	}, nil
+	resultData := map[string]any{
+		"agent_id": agentID,
+		"pid":      agentProcess.PID,
+		"status":   agentProcess.Status,
+		"message":  fmt.Sprintf("Агент '%s' запущен с PID %d.", agentID, agentProcess.PID),
+	}
+	jsonResult, err := json.Marshal(resultData)
+	if err != nil {
+		return nil, fmt.Errorf("не удалось сериализовать результат в JSON: %w", err)
+	}
+	return mcp.NewToolResultText(string(jsonResult)), nil
 }
 
 // readPipe читает данные из pipe и логирует их.
@@ -179,16 +167,17 @@ func (am *AgentManager) StopAgent(ctx context.Context, request mcp.CallToolReque
 	agentProcess.Status = "stopped"
 	log.Printf("Агент '%s' (PID %d) остановлен.\n", agentID, agentProcess.PID)
 
-	return &mcp.CallToolResult{
-		Result: JSONResult{
-			Data: map[string]any{
-				"agent_id": agentID,
-				"pid":      agentProcess.PID,
-				"status":   agentProcess.Status,
-				"message":  fmt.Sprintf("Агент '%s' (PID %d) остановлен.", agentID, agentProcess.PID),
-			},
-		}.ToMCPResult(),
-	}, nil
+	resultData := map[string]any{
+		"agent_id": agentID,
+		"pid":      agentProcess.PID,
+		"status":   agentProcess.Status,
+		"message":  fmt.Sprintf("Агент '%s' (PID %d) остановлен.", agentID, agentProcess.PID),
+	}
+	jsonResult, err := json.Marshal(resultData)
+	if err != nil {
+		return nil, fmt.Errorf("не удалось сериализовать результат в JSON: %w", err)
+	}
+	return mcp.NewToolResultText(string(jsonResult)), nil
 }
 
 // getAgentStatus возвращает статус агента PydanticAI.
@@ -204,18 +193,19 @@ func (am *AgentManager) GetAgentStatus(ctx context.Context, request mcp.CallTool
 		return nil, fmt.Errorf("агент '%s' не найден", agentID)
 	}
 
-	return &mcp.CallToolResult{
-		Result: JSONResult{
-			Data: map[string]any{
-				"agent_id":    agentID,
-				"pid":         agentProcess.PID,
-				"status":      agentProcess.Status,
-				"config_path": agentProcess.ConfigPath,
-				"start_time":  agentProcess.StartTime.Format(time.RFC3339),
-				"error":       agentProcess.Error,
-			},
-		}.ToMCPResult(),
-	}, nil
+	resultData := map[string]any{
+		"agent_id":    agentID,
+		"pid":         agentProcess.PID,
+		"status":      agentProcess.Status,
+		"config_path": agentProcess.ConfigPath,
+		"start_time":  agentProcess.StartTime.Format(time.RFC3339),
+		"error":       agentProcess.Error,
+	}
+	jsonResult, err := json.Marshal(resultData)
+	if err != nil {
+		return nil, fmt.Errorf("не удалось сериализовать результат в JSON: %w", err)
+	}
+	return mcp.NewToolResultText(string(jsonResult)), nil
 }
 
 // updateAgentConfig обновляет конфигурацию агента PydanticAI.
@@ -242,15 +232,16 @@ func (am *AgentManager) UpdateAgentConfig(ctx context.Context, request mcp.CallT
 
 	log.Printf("Конфигурация для агента '%s' успешно обновлена в файле: %s\n", agentID, configPath)
 
-	return &mcp.CallToolResult{
-		Result: JSONResult{
-			Data: map[string]any{
-				"agent_id":    agentID,
-				"config_path": configPath,
-				"message":     fmt.Sprintf("Конфигурация для агента '%s' успешно обновлена.", agentID),
-			},
-		}.ToMCPResult(),
-	}, nil
+	resultData := map[string]any{
+		"agent_id":    agentID,
+		"config_path": configPath,
+		"message":     fmt.Sprintf("Конфигурация для агента '%s' успешно обновлена.", agentID),
+	}
+	jsonResult, err := json.Marshal(resultData)
+	if err != nil {
+		return nil, fmt.Errorf("не удалось сериализовать результат в JSON: %w", err)
+	}
+	return mcp.NewToolResultText(string(jsonResult)), nil
 }
 
 // listAgents возвращает список всех зарегистрированных агентов и их статусы.
@@ -270,11 +261,12 @@ func (am *AgentManager) ListAgents(ctx context.Context, request mcp.CallToolRequ
 		})
 	}
 
-	return &mcp.CallToolResult{
-		Result: JSONResult{
-			Data: map[string]any{
-				"agents": agentsList,
-			},
-		}.ToMCPResult(),
-	}, nil
+	resultData := map[string]any{
+		"agents": agentsList,
+	}
+	jsonResult, err := json.Marshal(resultData)
+	if err != nil {
+		return nil, fmt.Errorf("не удалось сериализовать результат в JSON: %w", err)
+	}
+	return mcp.NewToolResultText(string(jsonResult)), nil
 }
