@@ -1,0 +1,9 @@
+{
+  "name": "TestAgent",
+  "version": "1.0",
+  "log_level": "INFO",
+  "parameters": {
+    "threshold": 0.75,
+    "interval_seconds": 2
+  }
+}
