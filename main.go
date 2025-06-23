@@ -67,17 +67,11 @@ func main() {
 		},
 	)
 
-	// Определяем порт для HTTP-сервера
-	httpPort := ":8080" // Можно изменить на другой порт, если нужно
-
-	// Создаем SSE-сервер
-	sseServer := server.NewSSEServer(mcpServer)
-
-	// Запускаем SSE-сервер в отдельной горутине
+	// Запускаем сервер в отдельной горутине
 	go func() {
-		log.Printf("Запуск MCP-сервера %s (версия %s) через SSE на порту %s...\n", serverName, serverVersion, httpPort)
-		if err := sseServer.Start(httpPort); err != nil {
-			log.Fatalf("Ошибка запуска SSE-сервера: %v", err)
+		log.Printf("Запуск MCP-сервера %s (версия %s) через Stdio...\n", serverName, serverVersion)
+		if err := server.ServeStdio(mcpServer); err != nil {
+			log.Fatalf("Ошибка запуска Stdio-сервера: %v", err)
 		}
 	}()
 
